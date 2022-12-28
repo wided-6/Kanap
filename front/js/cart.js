@@ -1,11 +1,14 @@
 
-function AjoutAuPanier() {
+function ajoutAuPanier() {
     let panier;
     let panierJson = window.localStorage.getItem("panier");
     if(panierJson != null) {
         panier = JSON.parse(panierJson)
         console.log(panier)
-
+        let totalQuantitySelector = document.getElementById("totalQuantity");
+        let totalPriceSelector = document.getElementById("totalPrice");
+        let totalQuantity = 0;
+        let totalPrice = 0;
         panier.forEach(function (productPanier) {
 
             fetch("http://localhost:3000/api/products/" + productPanier.id)
@@ -77,7 +80,15 @@ function AjoutAuPanier() {
                 cartItemDescriptionSelector.appendChild(cartItemContentSettingsSelector);
 
                 productArticleSelector.appendChild(cartItemContentSelector);
-        
+
+                totalQuantity = totalQuantity + productPanier.quantity;
+                totalPrice = totalPrice + (productPanier.quantity * product.price);
+                totalQuantitySelector.innerText = totalQuantity;
+                totalPriceSelector.innerText = totalPrice;
+
+                cartItemProductInputSelector.addEventListener('change', function (event) {
+                    updateTotalQuantity(event);
+                });
             });
     
         });
@@ -87,4 +98,43 @@ function AjoutAuPanier() {
     
 }
 
-AjoutAuPanier();
+function updateTotalQuantity(event) {
+    let targetElement = event.target;
+    let newQuantity = parseInt(targetElement.value);
+    let articleElement = targetElement.closest(".cart__item");
+    let currentProductId = articleElement.getAttribute("data-id");
+
+    console.log("Appel reçu suite changement qunatity");
+    console.log(newQuantity);
+
+    let panier;
+    let panierJson = window.localStorage.getItem("panier");
+    if(panierJson != null) {
+        panier = JSON.parse(panierJson)
+        let totalQuantitySelector = document.getElementById("totalQuantity");
+        let totalPriceSelector = document.getElementById("totalPrice");
+        let totalQuantity = 0;
+        let totalPrice = 0;
+        panier.forEach(function (productPanier) {
+
+            fetch("http://localhost:3000/api/products/" + productPanier.id)
+            .then(function (response) {
+                return response.json()
+            }).then(function (product) {
+                if(product._id == currentProductId) {
+                    console.log("Product Found")
+                    totalQuantity = totalQuantity + newQuantity;
+                    totalPrice = totalPrice + (newQuantity * product.price);
+                } else {
+                    totalQuantity = totalQuantity + productPanier.quantity;
+                    totalPrice = totalPrice + (productPanier.quantity * product.price);
+                }
+                
+                totalQuantitySelector.innerText = totalQuantity;
+                totalPriceSelector.innerText = totalPrice;
+            })
+        })  
+    }
+}  
+
+ajoutAuPanier();
