@@ -105,6 +105,7 @@ function updateTotalQuantity(event) {
     let currentProductId = articleElement.getAttribute("data-id");
 
     console.log("Appel reçu suite changement qunatity");
+    console.log(targetElement);
     console.log(newQuantity);
 
     let panier;
@@ -130,11 +131,47 @@ function updateTotalQuantity(event) {
                     totalPrice = totalPrice + (productPanier.quantity * product.price);
                 }
                 
+                productPanier.quantity = newQuantity;
                 totalQuantitySelector.innerText = totalQuantity;
                 totalPriceSelector.innerText = totalPrice;
+
+                window.localStorage.setItem("panier", JSON.stringify(panier));
             })
         })  
     }
-}  
+}
+
+function suppr(){
+    cart__items = document.getElementById("cart__items");
+    child = document.getElementById("deleteItem");
+    cart__items.removeChild(child);
+}
+
+
+function valider()
+
+	{
+
+    if (document.getElementById('firstName') == ""){
+	alert ("Veuillez entrer votre firstName!");
+	return false;
+    }
+
+    if (document.getElementById('lastName') == ""){
+     alert ("Veuillez entrer votre lastName!");
+     return false;
+    }
+
+    if (document.getElementById('email') == ""){
+    alert ("Veuillez entrer votre email!");
+      return false;
+    }
+
+    if (document.getElementById('order') == ""){
+    alert ("Veuillez commander!");
+       return false;
+    }
+
+}
 
 ajoutAuPanier();
