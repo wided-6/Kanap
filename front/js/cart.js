@@ -89,10 +89,15 @@ function ajoutAuPanier() {
                 cartItemProductInputSelector.addEventListener('change', function (event) {
                     updateTotalQuantity(event);
                 });
+
+                deleteItemSelector.addEventListener('click', function (event) {
+                    deleteProduct(event);
+                });
+                
             });
     
         });
-
+        
     }
 
     
@@ -136,15 +141,41 @@ function updateTotalQuantity(event) {
                 totalPriceSelector.innerText = totalPrice;
 
                 window.localStorage.setItem("panier", JSON.stringify(panier));
+                
             })
         })  
     }
+    
 }
 
-function suppr(){
-    cart__items = document.getElementById("cart__items");
-    child = document.getElementById("deleteItem");
-    cart__items.removeChild(child);
+function deleteProduct(event) {
+    let targetElement = event.target;
+    let articleElement = targetElement.closest(".cart__item");
+    let productId = articleElement.getAttribute("data-id");
+    let productColor = articleElement.getAttribute("data-color");
+    console.log("Appel reçu suite suppresion produit");
+    console.log(productId);
+    console.log(productColor);
+    let productQuantitySelector = articleElement.querySelector('.itemQuantity');
+    let productDescriptionSelector = articleElement.querySelector('.cart__item__content__description');
+    let productPriceSelector = productDescriptionSelector.children[2];
+    let totalQuantitySelector = document.getElementById("totalQuantity");
+    let totalPriceSelector = document.getElementById("totalPrice");
+    let totalPrice = parseInt(totalPriceSelector.innerText) - (parseInt(productQuantitySelector.value) * parseInt(productPriceSelector.textContent));
+    let totalQuantity = parseInt(totalQuantitySelector.innerText) - parseInt(productQuantitySelector.value);
+
+    totalQuantitySelector.innerText = totalQuantity;
+    totalPriceSelector.innerText = totalPrice;
+    let panierJson = window.localStorage.getItem("panier");
+    let panier = JSON.parse(panierJson);
+    let updatedPanier = new Array();
+    panier.forEach(function (product) {
+        if(product.id !== productId && product.color !== productColor) {
+            updatedPanier.push(product);
+        }
+    });
+    window.localStorage.setItem("panier", JSON.stringify(updatedPanier));
+    articleElement.remove();
 }
 
 
