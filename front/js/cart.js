@@ -178,31 +178,74 @@ function deleteProduct(event) {
     articleElement.remove();
 }
 
+function passerCommande() {
+  let firstNameSelector = document.getElementById("firstName"); 
+  let lastNameSelector = document.getElementById("lastName");
+  let addressSelector = document.getElementById("address");
+  let citySelector = document.getElementById("city");
+  let emailSelector = document.getElementById("email");
+  if (firstNameSelector.value == ''){
+    alert('merci de saisir le prénom');
+  }
+  if (lastNameSelector.value == ''){
+    alert('merci de saisir le nom');
+  }
+  if (addressSelector.value == ''){
+    alert('merci de saisir l\'address');
+  }
+  if (citySelector.value == ''){
+    alert('merci de saisir le city');
+  }
+  if (emailSelector.value == '') {
+    alert('merci de saisir l \'email');
+  } 
+  validateEmail(emailSelector.value);
+  let panierJson = window.localStorage.getItem("panier");
+  let panier = JSON.parse(panierJson);
+  let productIds = [];
+  panier.forEach(function (productPanier) {
+    productIds.push(productPanier.id);
+  })
+  let commandeDetails = {
+    "contact": { 
+        "firstName": firstNameSelector.value,
+        "lastName": lastNameSelector.value,
+        "address": addressSelector.value,
+        "city": citySelector.value,
+        "email": emailSelector.value
+      },
+    "products": productIds 
+  }
+  submit(commandeDetails);
+}
 
-function valider()
+let commanderSelector = document.getElementById("order");
+commanderSelector.addEventListener('click', function (event) {
+    passerCommande();
+});
 
-	{
 
-    if (document.getElementById('firstName') == ""){
-	alert ("Veuillez entrer votre firstName!");
-	return false;
+
+function validateEmail(email) {
+  let regexemail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if(email.match(regexemail) == null) {
+        alert('Veuiller inserer une adresse mail valid');
     }
+}
 
-    if (document.getElementById('lastName') == ""){
-     alert ("Veuillez entrer votre lastName!");
-     return false;
-    }
-
-    if (document.getElementById('email') == ""){
-    alert ("Veuillez entrer votre email!");
-      return false;
-    }
-
-    if (document.getElementById('order') == ""){
-    alert ("Veuillez commander!");
-       return false;
-    }
-
+function submit(commandeDetails) {
+    fetch('http://localhost:3000/api/products/order', 
+        {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json;charset=utf-8'
+          },
+        body: JSON.stringify(commandeDetails)
+        })
+        .then(response => response.json())
+        .then(result => {
+            location.href = 'confirmation.html?id=' + result.orderId;
+        });
 }
 
 ajoutAuPanier();
