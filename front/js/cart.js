@@ -180,26 +180,42 @@ function deleteProduct(event) {
 
 function passerCommande() {
   let firstNameSelector = document.getElementById("firstName"); 
+  let firstNameErrorMsgSelector = document.getElementById("firstNameErrorMsg")
   let lastNameSelector = document.getElementById("lastName");
+  let lastNameErrorMsgSelector = document.getElementById("lastNameErrorMsg")
   let addressSelector = document.getElementById("address");
+  let addressErrorMsgSelector = document.getElementById("addressErrorMsg")
   let citySelector = document.getElementById("city");
+  let cityErrorMsgSelector = document.getElementById("cityErrorMsg")
   let emailSelector = document.getElementById("email");
-  if (firstNameSelector.value == ''){
-    alert('merci de saisir le prénom');
+  let emailErrorMsgSelector = document.getElementById("emailErrorMsg")
+  if (firstNameSelector.value == '') {
+    firstNameErrorMsgSelector.innerText = "merci de saisir le prénom";
+  } else {
+    firstNameErrorMsgSelector.innerText = "";
   }
+ 
   if (lastNameSelector.value == ''){
-    alert('merci de saisir le nom');
+    lastNameErrorMsgSelector.innerText = "merci de saisir le nom";
+  } else {
+    lastNameErrorMsgSelector.innerText = "";
   }
   if (addressSelector.value == ''){
-    alert('merci de saisir l\'address');
+     addressErrorMsgSelector.innerText = "merci de saisir l\'address";
+  } else {
+     addressErrorMsgSelector.innerText = "";
   }
   if (citySelector.value == ''){
-    alert('merci de saisir le city');
+    cityErrorMsgSelector.innerText = "merci de saisir le city";
+  } else {
+    cityErrorMsgSelector.innerText = "";
   }
   if (emailSelector.value == '') {
-    alert('merci de saisir l \'email');
-  } 
-  validateEmail(emailSelector.value);
+    emailErrorMsgSelector.innerText = "merci de saisir l \'email";
+  } else {
+    validateEmail(emailSelector.value);
+  }
+  
   let panierJson = window.localStorage.getItem("panier");
   let panier = JSON.parse(panierJson);
   let productIds = [];
@@ -225,12 +241,14 @@ commanderSelector.addEventListener('click', function (event) {
 });
 
 
-
 function validateEmail(email) {
+  let emailErrorMsgSelector = document.getElementById("emailErrorMsg")
   let regexemail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
     if(email.match(regexemail) == null) {
-        alert('Veuiller inserer une adresse mail valid');
-    }
+        emailErrorMsgSelector.innerText = "veuillez inserer  une adresse email valide";
+  } else {
+        emailErrorMsgSelector.innerText = "";
+  }
 }
 
 function submit(commandeDetails) {
@@ -244,6 +262,7 @@ function submit(commandeDetails) {
         })
         .then(response => response.json())
         .then(result => {
+            window.localStorage.removeItem("panier");
             location.href = 'confirmation.html?id=' + result.orderId;
         });
 }
