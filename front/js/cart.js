@@ -1,5 +1,5 @@
 
-function ajoutAuPanier() {
+function ajoutAuPanier() { // On récupére depuis la page panier le panier via localstorage et on insére les elemnets dans la page panier
     let panier;
     let panierJson = window.localStorage.getItem("panier");
     if(panierJson != null) {
@@ -103,7 +103,7 @@ function ajoutAuPanier() {
     
 }
 
-function updateTotalQuantity(event) {
+function updateTotalQuantity(event) {  // Mise à jour de la quantité totale et le prix total  des produits
     let targetElement = event.target;
     let newQuantity = parseInt(targetElement.value);
     let articleElement = targetElement.closest(".cart__item");
@@ -148,7 +148,7 @@ function updateTotalQuantity(event) {
     
 }
 
-function deleteProduct(event) {
+function deleteProduct(event) {   // Mise à jour de la quantité totale et le prix total du produits suite à une suppression des uns
     let targetElement = event.target;
     let articleElement = targetElement.closest(".cart__item");
     let productId = articleElement.getAttribute("data-id");
@@ -178,7 +178,7 @@ function deleteProduct(event) {
     articleElement.remove();
 }
 
-function passerCommande() {
+function passerCommande(event) { // On récupére et on analyse les données saisies par l'utilisateur dans le formulaire 
   let firstNameSelector = document.getElementById("firstName"); 
   let firstNameErrorMsgSelector = document.getElementById("firstNameErrorMsg")
   let lastNameSelector = document.getElementById("lastName");
@@ -189,40 +189,55 @@ function passerCommande() {
   let cityErrorMsgSelector = document.getElementById("cityErrorMsg")
   let emailSelector = document.getElementById("email");
   let emailErrorMsgSelector = document.getElementById("emailErrorMsg")
-  if (firstNameSelector.value == '') {
-    firstNameErrorMsgSelector.innerText = "merci de saisir le prénom";
-  } else {
+  
+  let error = false;
+
+  if (validateInputNotEmpty(firstNameSelector.value)) {
     firstNameErrorMsgSelector.innerText = "";
+  } else {
+    firstNameErrorMsgSelector.innerText = "merci de saisir le prénom";
+    error = true;
   }
  
-  if (lastNameSelector.value == ''){
-    lastNameErrorMsgSelector.innerText = "merci de saisir le nom";
-  } else {
+  if (validateInputNotEmpty(lastNameSelector.value)){
     lastNameErrorMsgSelector.innerText = "";
-  }
-  if (addressSelector.value == ''){
-     addressErrorMsgSelector.innerText = "merci de saisir l\'address";
   } else {
-     addressErrorMsgSelector.innerText = "";
+    lastNameErrorMsgSelector.innerText = "merci de saisir le nom";
+    error = true;
   }
-  if (citySelector.value == ''){
-    cityErrorMsgSelector.innerText = "merci de saisir le city";
+  if (validateInputNotEmpty(addressSelector.value)){
+    addressErrorMsgSelector.innerText = "";
   } else {
+    addressErrorMsgSelector.innerText = "merci de saisir l \'address";
+    error = true;
+  }
+  if (validateInputNotEmpty(citySelector.value)){
     cityErrorMsgSelector.innerText = "";
+  } else {
+    cityErrorMsgSelector.innerText = "merci de saisir le city";
+    error = true;
   }
   if (emailSelector.value == '') {
     emailErrorMsgSelector.innerText = "merci de saisir l \'email";
+    error = true;
+  } else if(validateEmail(emailSelector.value)) {
+    emailErrorMsgSelector.innerText = "";
   } else {
-    validateEmail(emailSelector.value);
+    emailErrorMsgSelector.innerText = "veuillez inserer  une adresse email valide";
+    error = true;
   }
   
+  if(error == true) {
+    event.preventDefault();
+    return false;
+  }
   let panierJson = window.localStorage.getItem("panier");
   let panier = JSON.parse(panierJson);
   let productIds = [];
   panier.forEach(function (productPanier) {
     productIds.push(productPanier.id);
   })
-  let commandeDetails = {
+  let commandeDetails = {  // On cré l'objet contact et un tableau de  produits 
     "contact": { 
         "firstName": firstNameSelector.value,
         "lastName": lastNameSelector.value,
@@ -237,21 +252,32 @@ function passerCommande() {
 
 let commanderSelector = document.getElementById("order");
 commanderSelector.addEventListener('click', function (event) {
-    passerCommande();
+    passerCommande(event);
 });
 
 
-function validateEmail(email) {
-  let emailErrorMsgSelector = document.getElementById("emailErrorMsg")
-  let regexemail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
-    if(email.match(regexemail) == null) {
-        emailErrorMsgSelector.innerText = "veuillez inserer  une adresse email valide";
+function validateInputNotEmpty(text) {
+  text = text.replace(/\s/g, '');
+  let  regexEmpty = "^\s*$";
+  if(text.match(regexEmpty) == null) {
+    return true;  
   } else {
-        emailErrorMsgSelector.innerText = "";
+    return false;
   }
 }
 
-function submit(commandeDetails) {
+
+
+function validateEmail(email) {  // On vérifie les données saisie par l'utilsateur pour le champ email du formulaire
+  let regexemail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
+    if(email.match(regexemail) == null) {
+      return false;  
+  } else {
+      return true;
+  }
+}
+
+function submit(commandeDetails) {  // On effectue une requete POST sur l'API, on récpére l'id du commande et on se redirige vers la page de confirmation qui affiche le numéro du commande 
     fetch('http://localhost:3000/api/products/order', 
         {
         method: 'POST',

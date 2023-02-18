@@ -31,7 +31,7 @@ const itemsSelector = document.getElementById("items");
 /**
  * Get the products.
  */
-function getProducts() {
+function getProducts() {    // On récupére les produits de l'API et on les insére dans la page d'accueil
     fetch("http://localhost:3000/api/products")
         .then(function (response) {
             return response.json()
