@@ -46,10 +46,10 @@ function getProducts() {    // On récupére les produits de l'API et on les ins
                  productImageSelector.src = product.imageUrl;
                  productImageSelector.alt = product.altTxt;
                  let productNameSelector = document.createElement("h3");
-                 productNameSelector.class = "productName";
+                 productNameSelector.classList.add("productName");
                  productNameSelector.innerText = product.name;
                  let productDescriptionSelector = document.createElement("p");
-                 productDescriptionSelector.class = "productDescription";
+                 productDescriptionSelector.classList.add("productDescription");
                  productDescriptionSelector.innerText = product.description;
                  productArticleSelector.appendChild(productImageSelector);
                  productArticleSelector.appendChild(productNameSelector);

@@ -63,6 +63,7 @@ function ajoutAuPanier() { // On récupére depuis la page panier le panier via 
                 cartItemProductInputSelector.setAttribute("min", "1");
                 cartItemProductInputSelector.setAttribute("max", "100");
                 cartItemProductInputSelector.setAttribute("value", productPanier.quantity);
+                cartItemProductInputSelector.setAttribute("oninput", "validity.valid||(value='');");
 
                 cartItemContentSettingsQuantitySelector.appendChild(cartItemProductQuantitySelector);
                 cartItemContentSettingsQuantitySelector.appendChild(cartItemProductInputSelector);
@@ -108,6 +109,7 @@ function updateTotalQuantity(event) {  // Mise à jour de la quantité totale et
     let newQuantity = parseInt(targetElement.value);
     let articleElement = targetElement.closest(".cart__item");
     let currentProductId = articleElement.getAttribute("data-id");
+    let currentProductColor = articleElement.getAttribute("data-color");
 
     console.log("Appel reçu suite changement qunatity");
     console.log(targetElement);
@@ -127,16 +129,16 @@ function updateTotalQuantity(event) {  // Mise à jour de la quantité totale et
             .then(function (response) {
                 return response.json()
             }).then(function (product) {
-                if(product._id == currentProductId) {
+                if(product._id == currentProductId && productPanier.color == currentProductColor) {
                     console.log("Product Found")
                     totalQuantity = totalQuantity + newQuantity;
                     totalPrice = totalPrice + (newQuantity * product.price);
+                    productPanier.quantity = newQuantity;
                 } else {
                     totalQuantity = totalQuantity + productPanier.quantity;
                     totalPrice = totalPrice + (productPanier.quantity * product.price);
                 }
                 
-                productPanier.quantity = newQuantity;
                 totalQuantitySelector.innerText = totalQuantity;
                 totalPriceSelector.innerText = totalPrice;
 
@@ -192,14 +194,14 @@ function passerCommande(event) { // On récupére et on analyse les données sai
   
   let error = false;
 
-  if (validateInputNotEmpty(firstNameSelector.value)) {
+  if (validateName(firstNameSelector.value)) {
     firstNameErrorMsgSelector.innerText = "";
   } else {
     firstNameErrorMsgSelector.innerText = "merci de saisir le prénom";
     error = true;
   }
  
-  if (validateInputNotEmpty(lastNameSelector.value)){
+  if (validateName(lastNameSelector.value)){
     lastNameErrorMsgSelector.innerText = "";
   } else {
     lastNameErrorMsgSelector.innerText = "merci de saisir le nom";
@@ -266,7 +268,14 @@ function validateInputNotEmpty(text) {
   }
 }
 
-
+function validateName(text) {
+  const inputRegex = /^[a-zA-Z]+(?:[\s-][a-zA-Z]+)*$/;
+  if(inputRegex.test(text)) {
+    return true;  
+  } else {
+    return false;
+  }
+}
 
 function validateEmail(email) {  // On vérifie les données saisie par l'utilsateur pour le champ email du formulaire
   let regexemail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
